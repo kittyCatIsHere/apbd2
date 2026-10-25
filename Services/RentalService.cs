@@ -5,6 +5,8 @@ namespace apbd2.Services;
 
 public class RentalService
 {
+    private const int MaxRentalDays = 30;
+
     public List<Equipment> EquipmentList { get; } = new();
     public List<User> Users { get; } = new();
     public List<Rental> Rentals { get; } = new();
@@ -40,9 +42,9 @@ public class RentalService
             throw new InvalidOperationException(
                 "Equipment is not registered.");
 
-        if (days <= 0)
+        if (days < 1 || days > MaxRentalDays)
             throw new ArgumentException(
-                "Rental duration must be positive.");
+                $"Rental duration must be between 1 and {MaxRentalDays} days.");
 
         if (!equipment.IsAvailable)
             throw new InvalidOperationException(
@@ -58,7 +60,6 @@ public class RentalService
         Rental rental = new Rental(user, equipment, days);
 
         Rentals.Add(rental);
-
         equipment.ChangeStatus(EquipmentStatus.Rented);
 
         return rental;
@@ -98,8 +99,7 @@ public class RentalService
             throw new InvalidOperationException(
                 "Equipment is currently rented.");
 
-        equipment.ChangeStatus(
-            EquipmentStatus.Maintenance);
+        equipment.ChangeStatus(EquipmentStatus.Maintenance);
     }
 
     public void MarkDamaged(Equipment equipment)
@@ -113,8 +113,7 @@ public class RentalService
             throw new InvalidOperationException(
                 "Equipment is currently rented.");
 
-        equipment.ChangeStatus(
-            EquipmentStatus.Damaged);
+        equipment.ChangeStatus(EquipmentStatus.Damaged);
     }
 
     public void MarkAvailable(Equipment equipment)
@@ -128,8 +127,7 @@ public class RentalService
             throw new InvalidOperationException(
                 "Equipment is currently rented.");
 
-        equipment.ChangeStatus(
-            EquipmentStatus.Available);
+        equipment.ChangeStatus(EquipmentStatus.Available);
     }
 
     public IEnumerable<Equipment> GetAvailableEquipment()

@@ -162,3 +162,6 @@ displayService.DisplayAll(rentalService.EquipmentList);
 
 // 15. Final report
 reportService.PrintReport(rentalService);
+
+
+apbd2.Tests.RentalValidationTests.Run();
