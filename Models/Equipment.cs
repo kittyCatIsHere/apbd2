@@ -7,11 +7,20 @@ public abstract class Equipment
 
     public string Name { get; set; }
 
-    public bool IsAvailable { get; set; } = true;
+    public EquipmentStatus Status { get; private set; }
+        = EquipmentStatus.Available;
+
+    public bool IsAvailable =>
+        Status == EquipmentStatus.Available;
 
     protected Equipment(string name)
     {
         Name = name;
+    }
+
+    public void ChangeStatus(EquipmentStatus newStatus)
+    {
+        Status = newStatus;
     }
 
     public abstract string GetDetails();
