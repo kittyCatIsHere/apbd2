@@ -13,7 +13,20 @@ public class ReportService
             $"Total equipment: {service.EquipmentList.Count}");
 
         Console.WriteLine(
-            $"Available equipment: {service.GetAvailableEquipment().Count()}");
+            $"Available equipment: {service.EquipmentList.Count(
+                e => e.Status == EquipmentStatus.Available)}");
+
+        Console.WriteLine(
+            $"Rented equipment: {service.EquipmentList.Count(
+                e => e.Status == EquipmentStatus.Rented)}");
+
+        Console.WriteLine(
+            $"Under maintenance: {service.EquipmentList.Count(
+                e => e.Status == EquipmentStatus.Maintenance)}");
+
+        Console.WriteLine(
+            $"Damaged equipment: {service.EquipmentList.Count(
+                e => e.Status == EquipmentStatus.Damaged)}");
 
         Console.WriteLine(
             $"Total users: {service.Users.Count}");
