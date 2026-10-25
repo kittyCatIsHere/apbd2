@@ -13,11 +13,19 @@ public class RentalService
 
     public void AddEquipment(Equipment equipment)
     {
+        if (EquipmentList.Any(e => e.Id == equipment.Id))
+            throw new InvalidOperationException(
+                "Equipment already registered.");
+
         EquipmentList.Add(equipment);
     }
 
     public void AddUser(User user)
     {
+        if (Users.Any(u => u.Id == user.Id))
+            throw new InvalidOperationException(
+                "User already registered.");
+
         Users.Add(user);
     }
 
@@ -50,7 +58,8 @@ public class RentalService
         Rental rental = new Rental(user, equipment, days);
 
         Rentals.Add(rental);
-        equipment.IsAvailable = false;
+
+        equipment.ChangeStatus(EquipmentStatus.Rented);
 
         return rental;
     }
@@ -73,7 +82,9 @@ public class RentalService
             rental.DueDate, returnDate);
 
         rental.CompleteReturn(returnDate, penalty);
-        rental.Equipment.IsAvailable = true;
+
+        rental.Equipment.ChangeStatus(
+            EquipmentStatus.Available);
     }
 
     public void MarkUnavailable(Equipment equipment)
@@ -87,12 +98,44 @@ public class RentalService
             throw new InvalidOperationException(
                 "Equipment is currently rented.");
 
-        equipment.IsAvailable = false;
+        equipment.ChangeStatus(
+            EquipmentStatus.Maintenance);
+    }
+
+    public void MarkDamaged(Equipment equipment)
+    {
+        if (!EquipmentList.Contains(equipment))
+            throw new InvalidOperationException(
+                "Equipment not found.");
+
+        if (Rentals.Any(r =>
+            r.Equipment.Id == equipment.Id && r.IsActive))
+            throw new InvalidOperationException(
+                "Equipment is currently rented.");
+
+        equipment.ChangeStatus(
+            EquipmentStatus.Damaged);
+    }
+
+    public void MarkAvailable(Equipment equipment)
+    {
+        if (!EquipmentList.Contains(equipment))
+            throw new InvalidOperationException(
+                "Equipment not found.");
+
+        if (Rentals.Any(r =>
+            r.Equipment.Id == equipment.Id && r.IsActive))
+            throw new InvalidOperationException(
+                "Equipment is currently rented.");
+
+        equipment.ChangeStatus(
+            EquipmentStatus.Available);
     }
 
     public IEnumerable<Equipment> GetAvailableEquipment()
     {
-        return EquipmentList.Where(e => e.IsAvailable);
+        return EquipmentList.Where(
+            e => e.Status == EquipmentStatus.Available);
     }
 
     public IEnumerable<Rental> GetActiveRentals(User user)

@@ -5,6 +5,7 @@ using apbd2.Services;
 // Create services
 RentalService rentalService = new RentalService();
 ReportService reportService = new ReportService();
+EquipmentDisplayService displayService = new EquipmentDisplayService();
 
 // 1. Add equipment
 Laptop laptop = new Laptop("Dell XPS", 16, "Intel i7");
@@ -18,11 +19,7 @@ rentalService.AddEquipment(projector);
 rentalService.AddEquipment(laptop2);
 
 Console.WriteLine("=== EQUIPMENT ADDED ===");
-
-foreach (var equipment in rentalService.EquipmentList)
-{
-    Console.WriteLine(equipment.GetDetails());
-}
+displayService.DisplayAll(rentalService.EquipmentList);
 
 // 2. Add users
 User student = new User("Ali", "Yilmaz", UserType.Student);
@@ -41,8 +38,9 @@ Console.WriteLine("\n=== SUCCESSFUL RENTAL ===");
 Rental rental1 = rentalService.RentEquipment(student, laptop, 7);
 
 Console.WriteLine($"{student.FirstName} rented {laptop.Name}");
+displayService.DisplayAll(rentalService.EquipmentList);
 
-// 4. Invalid rental - unavailable equipment
+// 4. Invalid rental
 Console.WriteLine("\n=== INVALID RENTAL TEST ===");
 
 try
@@ -76,43 +74,20 @@ rentalService.ReturnEquipment(
 
 Console.WriteLine($"Penalty: {rental2.Penalty} PLN");
 
-// 7. Available equipment
-Console.WriteLine("\n=== AVAILABLE EQUIPMENT ===");
-
-foreach (var equipment in rentalService.GetAvailableEquipment())
-{
-    Console.WriteLine(equipment.GetDetails());
-}
-
-// 8. Mark equipment unavailable
+// 7. Mark equipment under maintenance
 Console.WriteLine("\n=== MAINTENANCE ===");
 
 rentalService.MarkUnavailable(projector);
 
 Console.WriteLine($"{projector.Name} marked unavailable");
 
-// 9. Active rentals
-Console.WriteLine("\n=== STUDENT ACTIVE RENTALS ===");
+// 8. Display equipment status
+displayService.DisplayAll(rentalService.EquipmentList);
 
-foreach (var rental in rentalService.GetActiveRentals(student))
-{
-    Console.WriteLine(rental.Equipment.Name);
-}
+// 9. Display available equipment
+displayService.DisplayAvailable(rentalService.EquipmentList);
 
-// 10. Overdue rentals
-Console.WriteLine("\n=== OVERDUE RENTALS ===");
-
-foreach (var rental in rentalService.GetOverdueRentals())
-{
-    Console.WriteLine(rental.Equipment.Name);
-}
-
-// 11. Final report
-reportService.PrintReport(rentalService);
-
-
-
-
+// 10. Student rental limit test
 Console.WriteLine("\n=== STUDENT RENTAL LIMIT TEST ===");
 
 User student2 = new User("Mehmet", "Kaya", UserType.Student);
@@ -126,15 +101,12 @@ rentalService.AddEquipment(laptop3);
 rentalService.AddEquipment(camera2);
 rentalService.AddEquipment(projector2);
 
-// First rental
 rentalService.RentEquipment(student2, laptop3, 7);
 Console.WriteLine("First rental successful.");
 
-// Second rental
 rentalService.RentEquipment(student2, camera2, 7);
 Console.WriteLine("Second rental successful.");
 
-// Third rental - should fail
 try
 {
     rentalService.RentEquipment(student2, projector2, 7);
@@ -145,15 +117,12 @@ catch (InvalidOperationException ex)
     Console.WriteLine($"Third rental blocked: {ex.Message}");
 }
 
-
-
-
+// 11. Employee rental limit test
 Console.WriteLine("\n=== EMPLOYEE RENTAL LIMIT TEST ===");
 
 User employee2 = new User("John", "Smith", UserType.Employee);
 rentalService.AddUser(employee2);
 
-// Create 6 equipment items
 for (int i = 1; i <= 6; i++)
 {
     Laptop testLaptop = new Laptop(
@@ -172,5 +141,24 @@ for (int i = 1; i <= 6; i++)
     }
 }
 
-// Display final report
+// 12. Active rentals for student
+Console.WriteLine("\n=== STUDENT ACTIVE RENTALS ===");
+
+foreach (var rental in rentalService.GetActiveRentals(student2))
+{
+    Console.WriteLine(rental.Equipment.Name);
+}
+
+// 13. Overdue rentals
+Console.WriteLine("\n=== OVERDUE RENTALS ===");
+
+foreach (var rental in rentalService.GetOverdueRentals())
+{
+    Console.WriteLine(rental.Equipment.Name);
+}
+
+// 14. Final equipment list
+displayService.DisplayAll(rentalService.EquipmentList);
+
+// 15. Final report
 reportService.PrintReport(rentalService);
