@@ -1,0 +1,15 @@
+
+# .NET build files
+bin/
+obj/
+
+# JetBrains CLion files
+.idea/
+cmake-build-*/
+
+# Visual Studio files
+.vs/
+
+# Temporary files
+*.tmp
+*.log
